@@ -1,3 +1,6 @@
+/*本程序使用HX711重量传感器、语音模块，完成倒酒机器人的开发*/
+/*机器人的功能包括：语音控制倒酒过程、喝的酒的量，如果一次倒酒超过一辆就立刻停止倒酒*/
+
 #include <Wire.h>
 #include <Servo.h>
 #define I2C_ADDR                    0x0f   //语音识别模块地址
@@ -281,6 +284,8 @@ void hx711_init()
   Serial.print(count0);
 }
 
+
+/*测量重量*/
 void gram_estimate()
 {
   count_avg=0;
@@ -304,6 +309,7 @@ void gram_estimate()
   
 }
 
+/*使HX711数据稳定后再测量重量*/
 void stable_gram()
 {
   int i=0;
@@ -322,6 +328,8 @@ void stable_gram()
   }
 }
 
+
+/*使用重量传感器获取重量，count需要做后续的处理*/
 long ReadCount()
 {
   digitalWrite(HX_SCK, LOW);
