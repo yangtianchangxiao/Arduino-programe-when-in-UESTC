@@ -41,6 +41,7 @@ long count0;
 int num=0;
 int init_gram=0;
 int flag=0;
+int gram_flag=0;
 /****************************
       寄存器设置函数  
 *****************************/
@@ -148,7 +149,11 @@ void setup() {
     AsrAddWords(6,"dao jiu");
     AsrAddWords(7,"song kai");
     AsrAddWords(8,"hao le");
-    while(cleck != 8)
+    AsrAddWords(9,"zhen hao");
+    AsrAddWords(10,"lai le");
+    AsrAddWords(11,"hai he");
+    AsrAddWords(12,"fang song");
+    while(cleck != 12)
     {
       WireReadData(ASR_NUM_CLECK,&cleck,1);
     //  Serial.println(cleck);
@@ -157,11 +162,14 @@ void setup() {
 #endif
 
     
-    I2CWrite(ASR_REC_GAIN,0x42);  //识别的灵敏度，建议0x40-0x55
+    I2CWrite(ASR_REC_GAIN,0x55);  //识别的灵敏度，建议0x40-0x55
     I2CWrite(ASR_VOICE_FLAG,0);  //识别结果提示音开关设置
     RGB_Set(255,255,255);//设置模块的RGB灯为白色
 
     hx711_init();
+    
+    gram_estimate();
+    delay(100);
     stable_gram();
     init_gram=count_avg;
     Serial.println("initial gram={}");
@@ -196,12 +204,26 @@ void loop() {
           rotate_servo.write(125);
         }
           gram_estimate();
-          Serial.println(count_avg+36);
-          if((count_avg+36>50+init_gram)&&(flag==0))
+          if(gram_flag==0)
           {
+          init_gram=count_avg;
+          gram_flag=1;
+          }
+          Serial.println(count_avg);
+         // Serial.println("50+init_gram");
+         // Serial.println(50+init_gram);
+          
+          if((count_avg>50+init_gram)&&(flag==0))
+          {
+            delay(100);
+            if(count_avg>50+init_gram)
+            {
            rotate_drive(125,30); 
            flag=1;
+            }
+           
           }
+          
           
         result=0;
 }
@@ -281,7 +303,7 @@ void hx711_init()
   for(int i=0; i<8; i++)
     count0 += ReadCount();
   count0 /= 8;
-  Serial.print(count0);
+ // Serial.print(count0);
 }
 
 
@@ -301,7 +323,7 @@ void gram_estimate()
       count_avg=count_avg/2500*6;
       num=0;
       break; 
-      //Serial.println(count_avg);
+     // Serial.println(count_avg);
     }
     
     delay(10);
